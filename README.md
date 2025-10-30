@@ -16,3 +16,5 @@ headers (boolean) = Whether the CSV contains headers
 .parse() converts file contents to a table. The table is indexed by header if availible, and otherwise by number. No headers are assumed if not specified.
 
 .toCsv() converts table contents into string. This string can be written straight to file to obtain a CSV.
+
+All functions return nil if it encounters a problem.
