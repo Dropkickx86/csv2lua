@@ -60,8 +60,9 @@ function csv2lua.parse(filePath, separator, headers)
             if firstLine and headers then
                 headersTable[indexCol] = fileLine:sub(charStart, charEnd)
             else
-                --Index with headers if aavailible
+                --Index with headers if availible
                 if headers then
+                    if headersTable[indexCol] == nil then headersTable[indexCol] = indexCol end
                     if charStart > charEnd then
                         outputTable[indexRow][headersTable[indexCol]] = nil
                     else
@@ -82,8 +83,11 @@ function csv2lua.parse(filePath, separator, headers)
         end
         --Read next line
         fileLine = file:read()
-        if firstLine then
+        if firstLine and headers then
             firstLine = false
+        elseif firstLine then
+            firstLine = false
+            indexRow = indexRow + 1
         else
             indexRow = indexRow + 1
         end
@@ -93,6 +97,7 @@ function csv2lua.parse(filePath, separator, headers)
     return outputTable
 end
 
+--TODO: currently doesn't work with tables with labels
 function csv2lua.toCsv(tb, separator, headers)
     if tb == nil then
         print("Table not specified")
@@ -100,7 +105,7 @@ function csv2lua.toCsv(tb, separator, headers)
     end
     if verifyTable(tb) then
         for i, v in pairs(tb) do
-            tb[i] = table.concat(v, ";")
+            tb[i] = table.concat(v, separator)
         end
         tb = table.concat(tb, "\n")
         return tb
