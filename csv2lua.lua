@@ -65,4 +65,33 @@ function csv2lua.parse(filePath, separator, headers)
     return outputTable
 end
 
+function csv2lua.toCsv(tb, separator, headers)
+    if csv2lua.verifyTable(tb) then
+        for i, v in pairs(tb) do
+            tb[i] = table.concat(v, ";")
+        end
+        tb = table.concat(tb, "\n")
+        return tb
+    else
+        print("Table verification failed")
+    end
+end
+
+--Function to check that the provided table can be converted to CSV
+function csv2lua.verifyTable(table)
+    for i, v in pairs(table) do
+        if type(v) ~= "table" then
+            print("Only two-dimentional tables can be converted to CSV")
+            return false
+        end
+        for i, s in pairs(v) do
+            if type(s) == "table" then
+                print("Only two-dimentional tables can be converted to CSV")
+                return false
+            end
+        end
+    end
+    return true
+end
+
 return csv2lua
