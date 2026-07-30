@@ -17,7 +17,13 @@ headers (boolean) = Whether the CSV contains headers
 
 All functions prints an error message and return nil if they encounter a problem.
 
-Can be installed with luarocks
+Can be installed with luarocks, from repo
+
+```
+luarocks install csv2lua
+```
+
+or locally
 
 ```
 git clone https://github.com/Dropkickx86/csv2lua.git
