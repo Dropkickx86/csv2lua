@@ -1,14 +1,20 @@
 local csv2lua = {}
 
 --Function to check that the provided table can be converted to CSV
-local function verifyTable(table)
-    for i, v in pairs(table) do
-        if type(v) ~= "table" then
+--@param tb Table
+--@return boolean
+local function verifyTable(tb)
+    if tb == nil then
+        print("Table is nil")
+        return false
+    end
+    for _, row in pairs(tb) do
+        if type(row) ~= "table" then
             print("Only two-dimentional tables can be converted to CSV")
             return false
         end
-        for i, s in pairs(v) do
-            if type(s) == "table" then
+        for _, col in pairs(row) do
+            if type(col) == "table" then
                 print("Only two-dimentional tables can be converted to CSV")
                 return false
             end
@@ -17,8 +23,12 @@ local function verifyTable(table)
     return true
 end
 
+--Function for reading a CSV and creating a table with the values
+--@param filepath Path to file
+--@param separator Separator used in file
+--@param Boolean if the data contains headers
+--@return table|nil
 function csv2lua.parse(filePath, separator, headers)
-    --Check that arguments are given
     if filePath == nil then
         print("Filepath not specified")
         return nil
@@ -26,89 +36,84 @@ function csv2lua.parse(filePath, separator, headers)
         print("Separator not specified")
         return nil
     end
-    --Open file
-    local file = io.open(filePath, "r")
-    --Check that file exists
-    if file == nil then
+
+    local f = io.open(filePath, "r")
+    if f == nil then
         print("Unable to open file")
         return nil
     end
-    --Create table where to store output value
-    local outputTable = {}
-    --If headers is not specified, set to false
-    if headers == nil then headers = false end
-    --Read first line
-    local fileLine = file:read()
-    local indexRow = 1
-    local headersTable = {}
+    
+    local outputTb = {}
+    local row = 1
+    local headersTb = {}
     local firstLine = true
-    --If line is read, aka not EOF
-    while fileLine ~= nil do
-        outputTable[indexRow] = {}
-        local indexCol = 1
-        --Check for EOL
-        while fileLine:len() > 0 do
-            --Get index of next separator
-            local ptr = fileLine:find(separator)
+    if headers == nil then headers = false end
+    
+    local fLine = f:read()
+    while fLine ~= nil do
+        outputTb[row] = {}
+        local col = 1
+        while fLine:len() > 0 do
+            local ptr = fLine:find(separator)
             if (ptr == nil) then
-                ptr = fileLine:len()
+                ptr = fLine:len()
             else
                 ptr = ptr - 1
             end
-            --Save headers, if applicable
+            
             if firstLine and headers then
-                headersTable[indexCol] = fileLine:sub(1, ptr)
+                headersTb[col] = fLine:sub(1, ptr)
             else
-                --Index with headers if availible
                 if headers then
-                    if headersTable[indexCol] == nil then headersTable[indexCol] = indexCol end
+                    if headersTb[col] == nil then headersTb[col] = col end
                     if ptr == 0 then
-                        outputTable[indexRow][headersTable[indexCol]] = nil
+                        outputTb[row][headersTb[col]] = nil
                     else
-                        outputTable[indexRow][headersTable[indexCol]] = fileLine:sub(1, ptr)
+                        outputTb[row][headersTb[col]] = fLine:sub(1, ptr)
                     end
-                --Index with numbers if headers are not availible
                 else
                     if ptr == 0 then
-                        outputTable[indexRow][indexCol] = nil
+                        outputTb[row][col] = nil
                     else
-                        outputTable[indexRow][indexCol] = fileLine:sub(1, ptr)
+                        outputTb[row][col] = fLine:sub(1, ptr)
                     end
                 end
             end
-            indexCol = indexCol + 1
-            fileLine = fileLine:sub(ptr + 2)
+
+            col = col + 1
+            fLine = fLine:sub(ptr + 2)
         end
-        --Read next line
-        fileLine = file:read()
+
+        fLine = f:read()
         if firstLine and headers then
             firstLine = false
         elseif firstLine then
             firstLine = false
-            indexRow = indexRow + 1
+            row = row + 1
         else
-            indexRow = indexRow + 1
+            row = row + 1
         end
     end
-    --Close file, return result
-    io.close(file)
-    return outputTable
+    
+    io.close(f)
+    return outputTb
 end
 
 --TODO: currently doesn't work with tables with labels
+--Function to convert a table to a string in format of csv
+--@param tb Table to convert
+--@param separator What separator to use
+--@param headers Boolean whether field names should be used as headers
+--@return string|nil
 function csv2lua.toCsv(tb, separator, headers)
-    if tb == nil then
-        print("Table not specified")
-        return nil
-    end
     if verifyTable(tb) then
         for i, v in pairs(tb) do
             tb[i] = table.concat(v, separator)
         end
-        tb = table.concat(tb, "\n")
-        return tb
+        return table.concat(tb, "\n")
     else
         print("Table verification failed")
+        return nil
     end
 end
 
