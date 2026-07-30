@@ -107,6 +107,7 @@ end
 function csv2lua.toCsv(tb, separator, headers)
     if verifyTable(tb) then
         local retVal = ""
+        if headers == nil then headers = false end
         if headers then
             for label, _ in pairs(tb[1]) do
                 retVal = retVal .. label .. separator
