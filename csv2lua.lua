@@ -30,7 +30,7 @@ function csv2lua.parse(filePath, separator, headers)
     local file = io.open(filePath, "r")
     --Check that file exists
     if file == nil then
-        print("unable to open file")
+        print("Unable to open file")
         return nil
     end
     --Create table where to store output value
@@ -46,40 +46,38 @@ function csv2lua.parse(filePath, separator, headers)
     while fileLine ~= nil do
         outputTable[indexRow] = {}
         local indexCol = 1
-        local charStart = 1
-        local charEnd = 1
         --Check for EOL
-        while fileLine:len() > charStart do
-            --Read until separator or EOL
-            while fileLine:sub(charEnd, charEnd) ~= separator and charEnd ~= fileLine:len() do
-                charEnd = charEnd + 1
+        while fileLine:len() > 0 do
+            --Get index of next separator
+            local ptr = fileLine:find(separator)
+            if (ptr == nil) then
+                ptr = fileLine:len()
+            else
+                ptr = ptr - 1
             end
-            --Ignore separator
-            charEnd = charEnd - 1
             --Save headers, if applicable
             if firstLine and headers then
-                headersTable[indexCol] = fileLine:sub(charStart, charEnd)
+                headersTable[indexCol] = fileLine:sub(1, ptr)
             else
                 --Index with headers if availible
                 if headers then
                     if headersTable[indexCol] == nil then headersTable[indexCol] = indexCol end
-                    if charStart > charEnd then
+                    if ptr == 0 then
                         outputTable[indexRow][headersTable[indexCol]] = nil
                     else
-                        outputTable[indexRow][headersTable[indexCol]] = fileLine:sub(charStart, charEnd)
+                        outputTable[indexRow][headersTable[indexCol]] = fileLine:sub(1, ptr)
                     end
                 --Index with numbers if headers are not availible
                 else
-                    if charStart > charEnd then
+                    if ptr == 0 then
                         outputTable[indexRow][indexCol] = nil
                     else
-                        outputTable[indexRow][indexCol] = fileLine:sub(charStart, charEnd)
+                        outputTable[indexRow][indexCol] = fileLine:sub(1, ptr)
                     end
                 end
             end
             indexCol = indexCol + 1
-            charStart = charEnd + 2
-            charEnd = charEnd + 2
+            fileLine = fileLine:sub(ptr + 2)
         end
         --Read next line
         fileLine = file:read()
