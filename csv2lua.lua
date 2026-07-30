@@ -99,7 +99,6 @@ function csv2lua.parse(filePath, separator, headers)
     return outputTb
 end
 
---TODO: currently doesn't work with tables with labels
 --Function to convert a table to a string in format of csv
 --@param tb Table to convert
 --@param separator What separator to use
@@ -108,6 +107,12 @@ end
 function csv2lua.toCsv(tb, separator, headers)
     if verifyTable(tb) then
         local retVal = ""
+        if headers then
+            for label, _ in pairs(tb[1]) do
+                retVal = retVal .. label .. separator
+            end
+            retVal = retVal:sub(1, retVal:len() - 1) .. "\n"
+        end
         for _, row in pairs(tb) do
             for _, v in pairs(row) do
                 retVal = retVal .. v .. separator
