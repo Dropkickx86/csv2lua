@@ -19,9 +19,8 @@ All functions prints an error message and return nil if they encounter a problem
 
 Can be installed with luarocks
 
-[source,bash]
-----
+```
 git clone https://github.com/Dropkickx86/csv2lua.git
 cd csv2lua
 luarocks make
-----
+```
