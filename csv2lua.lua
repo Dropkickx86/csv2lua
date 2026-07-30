@@ -107,10 +107,14 @@ end
 --@return string|nil
 function csv2lua.toCsv(tb, separator, headers)
     if verifyTable(tb) then
-        for i, v in pairs(tb) do
-            tb[i] = table.concat(v, separator)
+        local retVal = ""
+        for _, row in pairs(tb) do
+            for _, v in pairs(row) do
+                retVal = retVal .. v .. separator
+            end
+            retVal = retVal:sub(1, retVal:len() - 1) .. "\n"
         end
-        return table.concat(tb, "\n")
+        return retVal
     else
         print("Table verification failed")
         return nil
