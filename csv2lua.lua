@@ -25,8 +25,8 @@ end
 
 --Function for reading a CSV and creating a table with the values
 --@param filepath Path to file
---@param separator Separator used in file
---@param Boolean if the data contains headers
+--@param separator Separator used in file, ';' assumed
+--@param Boolean if the data contains headers, false assumed
 --@return table|nil
 function csv2lua.parse(filePath, separator, headers)
     if filePath == nil then
@@ -47,6 +47,7 @@ function csv2lua.parse(filePath, separator, headers)
     local row = 1
     local headersTb = {}
     local firstLine = true
+    if not separator then separator = ";" end
     if headers == nil then headers = false end
     
     local fLine = f:read()
@@ -101,12 +102,13 @@ end
 
 --Function to convert a table to a string in format of csv
 --@param tb Table to convert
---@param separator What separator to use
---@param headers Boolean whether field names should be used as headers
+--@param separator What separator to use, ';' assumed
+--@param headers Boolean whether field names should be used as headers, assumed false
 --@return string|nil
 function csv2lua.toCsv(tb, separator, headers)
     if verifyTable(tb) then
         local retVal = ""
+        if not separator then separator = ";" end
         if headers == nil then headers = false end
         if headers then
             for label, _ in pairs(tb[1]) do
