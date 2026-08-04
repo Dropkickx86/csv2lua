@@ -1,8 +1,8 @@
 package = "csv2lua"
-version = "1.1-1"
+version = "1.1-2"
 source = {
     url = "git://github.com/Dropkickx86/csv2lua",
-    tag = "v1.1-1"
+    tag = "v1.1-2"
 }
 description = {
     summary = "CSV to Lua table",
